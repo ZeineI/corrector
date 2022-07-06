@@ -2,15 +2,22 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/ZeineI/corrector/config"
+	logger "github.com/ZeineI/corrector/pkg/log"
 )
 
 func main() {
-	cfg, err := config.NewConfig()
+	logger, err := logger.NewLogger()
 	if err != nil {
-		fmt.Println(err)
+		log.Printf("Logger initialization error: %v", err)
 		return
 	}
-	fmt.Println(cfg)
+	cfg, err := config.NewConfig()
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+	fmt.Println(cfg, logger)
 }

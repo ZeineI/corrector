@@ -7,11 +7,16 @@ import (
 type (
 	Config struct {
 		Server Server `yaml:"server"`
+		Logger Logger `yaml:"logger"`
 	}
 
 	Server struct {
 		Host string `yaml:"host"`
 		Port string `yaml:"post"`
+	}
+
+	Logger struct {
+		logLevel string `yaml:"log_level"`
 	}
 )
 
