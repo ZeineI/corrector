@@ -15,7 +15,7 @@ type (
 	}
 )
 
-func ConfigNew() *viper.Viper {
+func newConfig() (*Config, error) {
 	configViper := viper.New()
 
 	// settings
@@ -23,7 +23,7 @@ func ConfigNew() *viper.Viper {
 	configViper.SetConfigType("yaml")
 	configViper.AddConfigPath("./config/")
 
-	return configViper
+	return ParseConfig(configViper)
 }
 
 func ParseConfig(configViper *viper.Viper) (*Config, error) {

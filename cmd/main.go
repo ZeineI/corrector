@@ -1,17 +1,14 @@
 package main
 
 import (
-	"corrector/config"
 	"fmt"
 )
 
 func main() {
-	configViper := config.ConfigNew()
-	comf, err := config.ParseConfig(configViper)
+	cfg, err := config.newConfig()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(comf.Server.Host)
-	fmt.Println(comf.Server.Port)
+	fmt.Println(cfg)
 }
