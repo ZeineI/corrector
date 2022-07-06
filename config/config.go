@@ -8,6 +8,7 @@ type (
 	Config struct {
 		Server Server `yaml:"server"`
 		Logger Logger `yaml:"logger"`
+		API    API    `yaml:"api"`
 	}
 
 	Server struct {
@@ -17,6 +18,10 @@ type (
 
 	Logger struct {
 		logLevel string `yaml:"log_level"`
+	}
+
+	API struct {
+		url string `yaml:"url"`
 	}
 )
 
