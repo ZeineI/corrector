@@ -15,7 +15,7 @@ type (
 	}
 )
 
-func newConfig() (*Config, error) {
+func NewConfig() (*Config, error) {
 	configViper := viper.New()
 
 	// settings
