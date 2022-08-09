@@ -1,23 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"log"
+	"flag"
 
-	"github.com/ZeineI/corrector/config"
-	logger "github.com/ZeineI/corrector/pkg/log"
+	"github.com/ZeineI/corrector/internal/app"
 )
 
 func main() {
-	logger, err := logger.NewLogger()
-	if err != nil {
-		log.Printf("Logger initialization error: %v", err)
-		return
-	}
-	cfg, err := config.NewConfig()
-	if err != nil {
-		logger.Error(err)
-		return
-	}
-	fmt.Println(cfg, logger)
+	configPath := flag.String("config-path", "./configs/config.yaml", "Path to the config file")
+	flag.Parse()
+
+	app.Run(*configPath)
 }
