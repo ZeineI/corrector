@@ -3,6 +3,7 @@ server:
   host: "localhost"
   port: 8080
 logger:
-  log_level: "debug"
+  log_level: "info"
 api:
-  url: "https://yandex.ru/dev/speller"
+  url: "https://speller.yandex.net/services/spellservice.json/checkTexts"
+  dataPath: "docs/text.json"

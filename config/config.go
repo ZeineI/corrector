@@ -21,7 +21,8 @@ type (
 	}
 
 	API struct {
-		url string `yaml:"url"`
+		Url      string `yaml:"url"`
+		DataPath string `yaml:"dataPath"`
 	}
 )
 
