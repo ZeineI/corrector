@@ -16,6 +16,16 @@ type RequestData struct {
 	Texts []string `json:"texts"`
 }
 
+type Response [][]struct {
+	Code int      `json:"code"`
+	Pos  int      `json:"pos"`
+	Row  int      `json:"row"`
+	Col  int      `json:"col"`
+	Len  int      `json:"len"`
+	Word string   `json:"word"`
+	S    []string `json:"s"`
+}
+
 func GetResponse(cfg *config.Config, logger *zap.SugaredLogger) ([]string, error) {
 	//get text
 	text, err := getText(cfg, logger)
@@ -75,8 +85,6 @@ func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]str
 		values.Add("format", "plain")
 
 		urL.RawQuery = values.Encode()
-		fmt.Println(sentence)
-		fmt.Println(urL.String())
 
 		req, err := http.NewRequest(http.MethodGet, urL.String(), nil)
 		if err != nil {
@@ -89,7 +97,26 @@ func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]str
 			logger.Info("Send request error")
 			return nil, err
 		}
-		fmt.Println(response)
+
+		if response.StatusCode != http.StatusOK {
+			logger.Info(response.StatusCode)
+			return nil, err
+		}
+
+		body, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			logger.Info("response body io error")
+			return nil, err
+		}
+
+		defer response.Body.Close()
+
+		var resp Response
+		if err := json.Unmarshal(body, &resp); err != nil {
+			logger.Info(err)
+			return nil, err
+		}
+		fmt.Println(resp)
 	}
 
 	return nil, nil
