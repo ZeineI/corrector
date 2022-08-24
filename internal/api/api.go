@@ -2,7 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/ZeineI/corrector/config"
@@ -57,5 +60,37 @@ func getText(cfg *config.Config, logger *zap.SugaredLogger) ([]string, error) {
 }
 
 func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]string, error) {
-	var result []string
+	// var result []string
+
+	for _, sentence := range text {
+		urL, err := url.Parse(cfg.API.Url)
+		if err != nil {
+			logger.Info("Parse url error")
+			return nil, err
+		}
+
+		values := urL.Query()
+		values.Add("text", sentence)
+		values.Add("lang", "ru")
+		values.Add("format", "plain")
+
+		urL.RawQuery = values.Encode()
+		fmt.Println(sentence)
+		fmt.Println(urL.String())
+
+		req, err := http.NewRequest(http.MethodGet, urL.String(), nil)
+		if err != nil {
+			logger.Info("Cant form request")
+			return nil, err
+		}
+
+		response, err := http.DefaultClient.Do(req)
+		if err != nil {
+			logger.Info("Send request error")
+			return nil, err
+		}
+		fmt.Println(response)
+	}
+
+	return nil, nil
 }
