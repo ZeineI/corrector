@@ -7,3 +7,5 @@ logger:
 api:
   url: "https://speller.yandex.net/services/spellservice.json/checkTexts"
   dataPath: "docs/text.json"
+  textLang: "ru"
+  textFormat: "plain"

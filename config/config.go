@@ -21,8 +21,10 @@ type (
 	}
 
 	API struct {
-		Url      string `yaml:"url"`
-		DataPath string `yaml:"dataPath"`
+		Url        string `yaml:"url"`
+		DataPath   string `yaml:"dataPath"`
+		TextLang   string `yaml:"textLang"`
+		TextFormat string `yaml:"textFormat"`
 	}
 )
 

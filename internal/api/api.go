@@ -70,7 +70,7 @@ func getText(cfg *config.Config, logger *zap.SugaredLogger) ([]string, error) {
 }
 
 func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]string, error) {
-	// var result []string
+	var result []string
 
 	for _, sentence := range text {
 		urL, err := url.Parse(cfg.API.Url)
@@ -81,14 +81,14 @@ func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]str
 
 		values := urL.Query()
 		values.Add("text", sentence)
-		values.Add("lang", "ru")
-		values.Add("format", "plain")
+		values.Add("lang", cfg.API.TextLang)
+		values.Add("format", cfg.API.TextFormat)
 
 		urL.RawQuery = values.Encode()
 
 		req, err := http.NewRequest(http.MethodGet, urL.String(), nil)
 		if err != nil {
-			logger.Info("Cant form request")
+			logger.Info("Can't form request")
 			return nil, err
 		}
 
@@ -116,8 +116,33 @@ func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]str
 			logger.Info(err)
 			return nil, err
 		}
-		fmt.Println(resp)
+
+		if noMistake(resp) {
+			continue
+		}
+
+		correctSentence, err := correctVersion(logger, resp)
+
+		if err != nil {
+			logger.Info("Transform sentence into correct ver error")
+			return nil, err
+		}
+		result = append(result, correctSentence)
 	}
 
-	return nil, nil
+	return result, nil
+}
+
+func correctVersion(logger *zap.SugaredLogger, incorrect Response) (string, error) {
+	fmt.Println(incorrect)
+	fmt.Println(len(incorrect))
+	return "", nil
+}
+
+func noMistake(resp Response) bool {
+	if len(resp[0]) == 0 {
+		return true
+	}
+
+	return false
 }
