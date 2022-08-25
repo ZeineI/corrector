@@ -73,18 +73,12 @@ func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]str
 	var result []string
 
 	for _, sentence := range text {
-		urL, err := url.Parse(cfg.API.Url)
+
+		urL, err := formURL(cfg, logger, sentence)
 		if err != nil {
-			logger.Info("Parse url error")
+			logger.Info("Build url error")
 			return nil, err
 		}
-
-		values := urL.Query()
-		values.Add("text", sentence)
-		values.Add("lang", cfg.API.TextLang)
-		values.Add("format", cfg.API.TextFormat)
-
-		urL.RawQuery = values.Encode()
 
 		req, err := http.NewRequest(http.MethodGet, urL.String(), nil)
 		if err != nil {
@@ -103,17 +97,9 @@ func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]str
 			return nil, err
 		}
 
-		body, err := ioutil.ReadAll(response.Body)
+		resp, err := unPack(logger, response)
 		if err != nil {
-			logger.Info("response body io error")
-			return nil, err
-		}
-
-		defer response.Body.Close()
-
-		var resp Response
-		if err := json.Unmarshal(body, &resp); err != nil {
-			logger.Info(err)
+			logger.Info("Unpack process error")
 			return nil, err
 		}
 
@@ -145,4 +131,39 @@ func noMistake(resp Response) bool {
 	}
 
 	return false
+}
+
+func unPack(logger *zap.SugaredLogger, response *http.Response) (Response, error) {
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		logger.Info("response body io error")
+		return nil, err
+	}
+
+	defer response.Body.Close()
+
+	var resp Response
+	if err := json.Unmarshal(body, &resp); err != nil {
+		logger.Info(err)
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func formURL(cfg *config.Config, logger *zap.SugaredLogger, sentence string) (*url.URL, error) {
+	urL, err := url.Parse(cfg.API.Url)
+	if err != nil {
+		logger.Info("Parse url error")
+		return nil, err
+	}
+
+	values := urL.Query()
+	values.Add("text", sentence)
+	values.Add("lang", cfg.API.TextLang)
+	values.Add("format", cfg.API.TextFormat)
+
+	urL.RawQuery = values.Encode()
+
+	return urL, nil
 }
