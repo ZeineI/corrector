@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -73,10 +72,7 @@ func getText(cfg *config.Config, logger *zap.SugaredLogger) ([]string, error) {
 func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]string, error) {
 	var result []string
 
-	for i, sentence := range text {
-		if i != 13 {
-			continue
-		}
+	for _, sentence := range text {
 
 		urL, err := formURL(cfg, logger, sentence)
 		if err != nil {
@@ -112,25 +108,17 @@ func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]str
 			continue
 		}
 
-		correctSentence, err := correctVersion(logger, resp, sentence)
-
-		if err != nil {
-			logger.Info("Transform sentence into correct ver error")
-			return nil, err
-		}
-		result = append(result, correctSentence)
+		result = append(result, correctVersion(logger, resp, sentence))
 	}
 
 	return result, nil
 }
 
-func correctVersion(logger *zap.SugaredLogger, incorrect Response, sentence string) (string, error) {
-	fmt.Println(sentence)
-	fmt.Println(incorrect)
-	result := strings.Replace(sentence, incorrect[0][0].Word, incorrect[0][0].S[0], 1)
-	// fmt.Println(incorrect[0][0].Word, incorrect[0][0].S[0])
-	fmt.Println(result)
-	return "", nil
+func correctVersion(logger *zap.SugaredLogger, incorrect Response, sentence string) string {
+	for _, eachMistake := range incorrect[0] {
+		sentence = strings.Replace(sentence, eachMistake.Word, eachMistake.S[0], -1)
+	}
+	return sentence
 }
 
 func noMistake(resp Response) bool {
