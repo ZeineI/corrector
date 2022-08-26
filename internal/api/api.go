@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/ZeineI/corrector/config"
 	"go.uber.org/zap"
@@ -72,7 +73,10 @@ func getText(cfg *config.Config, logger *zap.SugaredLogger) ([]string, error) {
 func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]string, error) {
 	var result []string
 
-	for _, sentence := range text {
+	for i, sentence := range text {
+		if i != 13 {
+			continue
+		}
 
 		urL, err := formURL(cfg, logger, sentence)
 		if err != nil {
@@ -104,10 +108,11 @@ func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]str
 		}
 
 		if noMistake(resp) {
+			result = append(result, sentence)
 			continue
 		}
 
-		correctSentence, err := correctVersion(logger, resp)
+		correctSentence, err := correctVersion(logger, resp, sentence)
 
 		if err != nil {
 			logger.Info("Transform sentence into correct ver error")
@@ -119,9 +124,12 @@ func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]str
 	return result, nil
 }
 
-func correctVersion(logger *zap.SugaredLogger, incorrect Response) (string, error) {
+func correctVersion(logger *zap.SugaredLogger, incorrect Response, sentence string) (string, error) {
+	fmt.Println(sentence)
 	fmt.Println(incorrect)
-	fmt.Println(len(incorrect))
+	result := strings.Replace(sentence, incorrect[0][0].Word, incorrect[0][0].S[0], 1)
+	// fmt.Println(incorrect[0][0].Word, incorrect[0][0].S[0])
+	fmt.Println(result)
 	return "", nil
 }
 
