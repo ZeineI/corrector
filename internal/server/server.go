@@ -18,10 +18,7 @@ func NewServer() *Server {
 
 func (server *Server) Run(cfg *config.Config, logger *zap.SugaredLogger) error {
 	server.router.GET("/", text)
-	if err := server.router.Run(); err != nil {
-		return err
-	}
-	return nil
+	return server.router.Run()
 }
 
 func text(c *gin.Context) {
