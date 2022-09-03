@@ -12,10 +12,4 @@ func main() {
 
 	app.Run(*configPath)
 
-	// quit := make(chan os.Signal, 1)
-	// signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
-
-	// <-quit
-
-	// fmt.Println("\napp shutting down")
 }

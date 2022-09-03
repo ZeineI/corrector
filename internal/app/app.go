@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/ZeineI/corrector/config"
@@ -21,12 +20,14 @@ func Run(configPath string) {
 	}
 
 	resp, err := api.GetResponse(cfg, logger)
-	fmt.Println(resp)
+	if err != nil {
+		logger.Fatal(err)
+	}
 
 	router := server.NewServer()
 
-	if err := router.Run(cfg, logger); err != nil {
-		logger.Debug(err)
+	if err := router.Run(cfg, logger, resp); err != nil {
+		logger.Info(err)
 		return
 	}
 }

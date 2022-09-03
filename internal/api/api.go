@@ -40,7 +40,7 @@ func GetResponse(cfg *config.Config, logger *zap.SugaredLogger) ([]string, error
 		return nil, err
 	}
 
-	return result, nil
+	return result.Texts, nil
 }
 
 func getText(cfg *config.Config, logger *zap.SugaredLogger) ([]string, error) {
@@ -69,46 +69,46 @@ func getText(cfg *config.Config, logger *zap.SugaredLogger) ([]string, error) {
 	return reqData.Texts, nil
 }
 
-func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) ([]string, error) {
-	var result []string
+func doHTTP(cfg *config.Config, logger *zap.SugaredLogger, text []string) (RequestData, error) {
+	var result RequestData
 
 	for _, sentence := range text {
 
 		urL, err := formURL(cfg, logger, sentence)
 		if err != nil {
 			logger.Info("Build url error")
-			return nil, err
+			return result, err
 		}
 
 		req, err := http.NewRequest(http.MethodGet, urL.String(), nil)
 		if err != nil {
 			logger.Info("Can't form request")
-			return nil, err
+			return result, err
 		}
 
 		response, err := http.DefaultClient.Do(req)
 		if err != nil {
 			logger.Info("Send request error")
-			return nil, err
+			return result, err
 		}
 
 		if response.StatusCode != http.StatusOK {
 			logger.Info(response.StatusCode)
-			return nil, err
+			return result, err
 		}
 
 		resp, err := unPack(logger, response)
 		if err != nil {
 			logger.Info("Unpack process error")
-			return nil, err
+			return result, err
 		}
 
 		if noMistake(resp) {
-			result = append(result, sentence)
+			result.Texts = append(result.Texts, sentence)
 			continue
 		}
 
-		result = append(result, correctVersion(logger, resp, sentence))
+		result.Texts = append(result.Texts, correctVersion(logger, resp, sentence))
 	}
 
 	return result, nil

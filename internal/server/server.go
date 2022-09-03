@@ -16,11 +16,11 @@ func NewServer() *Server {
 	}
 }
 
-func (server *Server) Run(cfg *config.Config, logger *zap.SugaredLogger) error {
-	server.router.GET("/", text)
+func (server *Server) Run(cfg *config.Config, logger *zap.SugaredLogger, text []string) error {
+	server.router.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"texts": text,
+		})
+	})
 	return server.router.Run()
-}
-
-func text(c *gin.Context) {
-	c.String(200, "Hello")
 }
