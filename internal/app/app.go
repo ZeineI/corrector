@@ -6,6 +6,7 @@ import (
 
 	"github.com/ZeineI/corrector/config"
 	"github.com/ZeineI/corrector/internal/api"
+	"github.com/ZeineI/corrector/internal/server"
 	logger "github.com/ZeineI/corrector/pkg/log"
 )
 
@@ -22,10 +23,10 @@ func Run(configPath string) {
 	resp, err := api.GetResponse(cfg, logger)
 	fmt.Println(resp)
 
-	// server := server.NewServer(cfg)
+	router := server.NewServer()
 
-	// if err := server.Run(cfg, logger); err != nil {
-	// 	logger.Debug(err)
-	// 	return
-	// }
+	if err := router.Run(cfg, logger); err != nil {
+		logger.Debug(err)
+		return
+	}
 }
